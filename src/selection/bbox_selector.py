@@ -3,7 +3,7 @@
 Provides a full-screen overlay for selecting a screen region via click-and-drag.
 """
 
-from PyQt5.QtCore import Qt, QRect, QPoint
+from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 from PyQt5.QtGui import QPainter, QColor, QPen, QBrush, QCursor
 
@@ -16,7 +16,7 @@ class BBoxSelector(QWidget):
             Args: (x: int, y: int, width: int, height: int)
     """
     
-    bboxSelected = Qt.Signal(int, int, int, int)
+    bboxSelected = pyqtSignal(int, int, int, int)
     
     def __init__(self, parent=None):
         """Initialize the bounding box selector."""
