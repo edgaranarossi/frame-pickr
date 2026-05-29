@@ -1,0 +1,93 @@
+/* Qt Stylesheet for Frame Capture Application - Modern Theme */
+
+QMainWindow {
+    background-color: #f0f2f5;
+}
+
+QFrame {
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+QPushButton {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 10pt;
+    min-width: 100px;
+}
+
+QPushButton:hover {
+    background-color: #1976d2;
+}
+
+QPushButton:pressed {
+    background-color: #0d47a1;
+}
+
+QPushButton#cancelButton {
+    background-color: #e74c3c;
+}
+
+QPushButton#cancelButton:hover {
+    background-color: #c0392b;
+}
+
+QPushButton#confirmButton {
+    background-color: #27ae60;
+}
+
+QPushButton#confirmButton:hover {
+    background-color: #219a52;
+}
+
+QLabel {
+    color: #333333;
+}
+
+QLabel#titleLabel {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #2196f3;
+}
+
+QLabel#statusLabel {
+    font-size: 9pt;
+    color: #666666;
+}
+
+QSpinBox {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    min-width: 80px;
+}
+
+QSpinBox:focus {
+    border: 1px solid #2196f3;
+}
+
+QScrollArea {
+    background-color: #fafafa;
+}
+
+QWidget#container {
+    background-color: #fafafa;
+}
+
+QDialog {
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+QLineEdit {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #2196f3;
+}

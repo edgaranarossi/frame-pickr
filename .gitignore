@@ -1,1 +1,35 @@
+# Docs directory - contains design documents
 docs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Build artifacts
+dist/
+build/
+*.spec
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# User-specific files
+*.log
+*.ini
+
+# Temporary files
+*.tmp
+*.temp
+
+# Executable (keep source, not binaries)
+dist/
