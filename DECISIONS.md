@@ -2,6 +2,11 @@
 
 *Dated log: decision · alternatives · reason. Newest first. Entries before 2026-07-19 are reconstructed from git history and code only — where the reason isn't recorded anywhere, it says so.*
 
+## 2026-07-19 — Adopted `tools/fix_bbox.py` (one-shot restore script) from the projects root
+
+- `fix_bbox.py` had sat loose at the projects root since 2026-05-30: a one-shot script that overwrites `src\selection\bbox_selector.py` (at the project's old `C:\Users\edgar\Scripts\frame-capture-app` location) with an embedded early single-screen version of the selector — evidently used to restore or bootstrap the file during initial development, the same day this project was created. Why the restore was needed was never recorded. TODO(edgar): fill in if remembered.
+- It was briefly housed in its own `fix-bbox` project earlier today before Edgar decided it belongs here; that folder is deleted and the script now lives under `tools/` as a historical artifact with a DO-NOT-RUN header (its hardcoded path is defunct, and pointing it at the live tree would clobber the current multi-monitor `bbox_selector.py`). The leftover remote `edgaranarossi/fix-bbox` awaits Edgar's manual deletion.
+
 ## 2026-07-19 — Doc-set backfill + structure conformance
 
 - Backfilled the constitution doc set (PLAN.md, DECISIONS.md, WISHLIST.md; README conformed with dated status lines) as part of the projects-root migration to `C:\Users\edgar\projects`. No code touched.
