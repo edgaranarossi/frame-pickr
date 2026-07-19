@@ -1,4 +1,4 @@
-# Docs directory - contains design documents
+# Docs directory - design/implementation specs kept local (decision 2026-05-30, see DECISIONS.md)
 docs/
 
 # Python cache
@@ -8,12 +8,21 @@ __pycache__/
 
 # Virtual environment
 venv/
-.env/
 .venv/
 
-# Build artifacts
+# Secrets
+.env
+
+# Runtime output (frame cache PNGs land inside src/cache/ next to the code — see PLAN.md)
+src/cache/*.png
+src/test_output.txt
+
+# Build artifacts (keep the build scripts themselves tracked; ignore PyInstaller junk)
 dist/
-build/
+build/*
+!build/requirements.txt
+!build/setup.py
+!build/build.bat
 *.spec
 *.pyc
 

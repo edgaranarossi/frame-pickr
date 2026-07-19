@@ -1,6 +1,12 @@
 # Frame Capture Application
 
+> **2026-07-19:** Doc set backfilled per projects constitution; stale `Scripts\` paths fixed; `.gitignore` overhauled (runtime PNG cache + logs ignored, `build/` scripts un-ignored). Code untouched since 2026-05-30: v1 is feature-complete and on GitHub (`frame-pickr`), but the working tree carries a large **uncommitted** 2026-05-30 rework (startup loading window, bbox selector + clipboard overhaul, headless test harness) — see PLAN.md.
+>
+> **2026-05-30:** Initial implementation completed and pushed (per docs/superpowers/specs/README.md).
+
 A Windows GUI application for capturing and browsing screen frames with a configurable bounding box.
+
+Doc set: [PLAN.md](PLAN.md) · [DECISIONS.md](DECISIONS.md) · [WISHLIST.md](WISHLIST.md). Original design + implementation specs live in `docs/superpowers/specs/` (kept local, gitignored — see DECISIONS.md 2026-05-30).
 
 ## Features
 
@@ -22,7 +28,7 @@ A Windows GUI application for capturing and browsing screen frames with a config
 ### Using Anaconda (Recommended)
 
 ```bash
-cd C:\Users\edgar\Scripts\frame-capture-app
+cd C:\Users\edgar\projects\frame-capture-app
 conda create -n framecapture python=3.10
 conda activate framecapture
 pip install -r build/requirements.txt
@@ -31,13 +37,13 @@ pip install -r build/requirements.txt
 ### Using pip
 
 ```bash
-cd C:\Users\edgar\Scripts\frame-capture-app
+cd C:\Users\edgar\projects\frame-capture-app
 python -m pip install -r build/requirements.txt
 ```
 
 ## Usage
 
-1. Run the application:
+1. Run the application (or just double-click `run.bat`, which activates the `framecapture` conda env for you):
    ```bash
    python src/main.py
    ```
@@ -57,11 +63,13 @@ python -m pip install -r build/requirements.txt
 Run the build script:
 
 ```bash
-cd C:\Users\edgar\Scripts\frame-capture-app
+cd C:\Users\edgar\projects\frame-capture-app
 build\build.bat
 ```
 
 The executable will be created at `dist/FrameCaptureTool.exe`
+
+**Warning:** `build.bat` currently deletes the `build/` directory (its own home, including `requirements.txt`) before building — it self-destructs. Fix it before the next exe build; tracked in PLAN.md.
 
 ## Configuration
 
@@ -77,31 +85,34 @@ Key settings:
 ## Project Structure
 
 ```
-Scripts/
-└── frame-capture-app/
-    ├── src/
-    │   ├── main.py              # Application entry point
-    │   ├── window/
-    │   │   └── main_window.py   # Main window UI
-    │   ├── selection/
-    │   │   └── bbox_selector.py # Bounding box selection
-    │   ├── capture/
-    │   │   └── frame_capture.py # Screen capture engine
-    │   ├── cache/
-    │   │   └── frame_cache.py   # Frame caching system
-    │   ├── gallery/
-    │   │   └── frame_gallery.py # Gallery and preview
-    │   ├── utils/
-    │   │   ├── clipboard.py     # Clipboard operations
-    │   │   ├── config.py        # Configuration management
-    │   │   └── paths.py         # Path utilities
-    │   └── resources/
-    │       └── styles.qss       # Qt stylesheet
-    ├── build/
-    │   ├── requirements.txt
-    │   ├── setup.py
-    │   └── build.bat
-    └── README.md
+frame-capture-app/
+├── src/
+│   ├── main.py              # Application entry point
+│   ├── window/
+│   │   └── main_window.py   # Main window UI
+│   ├── selection/
+│   │   └── bbox_selector.py # Bounding box selection
+│   ├── capture/
+│   │   └── frame_capture.py # Screen capture engine
+│   ├── cache/
+│   │   └── frame_cache.py   # Frame caching system (runtime PNGs land here too — gitignored)
+│   ├── gallery/
+│   │   └── frame_gallery.py # Gallery and preview
+│   ├── test/
+│   │   └── headless_test.py # Automated no-GUI capture test (uncommitted)
+│   ├── utils/
+│   │   ├── clipboard.py     # Clipboard operations
+│   │   ├── config.py        # Configuration management
+│   │   └── paths.py         # Path utilities
+│   └── resources/
+│       └── styles.qss       # Qt stylesheet
+├── build/
+│   ├── requirements.txt
+│   ├── setup.py
+│   └── build.bat
+├── docs/superpowers/specs/  # Design + implementation plan (local only, gitignored)
+├── run.bat
+└── README.md
 ```
 
 ## Development
@@ -127,6 +138,7 @@ Scripts/
 | `clipboard.py` | Copy frames to clipboard |
 | `config.py` | Configuration management with QSettings |
 | `paths.py` | Path utilities for app data and temp files |
+| `test/headless_test.py` | Headless capture test: random bbox, 5s capture, validate |
 
 ## License
 
