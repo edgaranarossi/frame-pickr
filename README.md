@@ -6,7 +6,7 @@
 
 A Windows GUI application for capturing and browsing screen frames with a configurable bounding box.
 
-Doc set: [PLAN.md](PLAN.md) · [DECISIONS.md](DECISIONS.md) · [WISHLIST.md](WISHLIST.md). Original design + implementation specs live in `docs/superpowers/specs/` (kept local, gitignored — see DECISIONS.md 2026-05-30).
+Doc set: [PLAN.md](PLAN.md) · [DECISIONS.md](DECISIONS.md) · [WISHLIST.md](WISHLIST.md). Original design + implementation specs live in `docs/superpowers/specs/` (kept local, gitignored — see DECISIONS.md 2026-05-30; only that folder's small `README.md` index is still tracked in git).
 
 ## Features
 
@@ -73,8 +73,8 @@ The executable will be created at `dist/FrameCaptureTool.exe`
 
 ## Configuration
 
-Configuration is stored in Windows Registry at:
-`HKEY_CURRENT_USER\Software\FrameCaptureApp\FrameCaptureApp`
+Configuration is stored via `QSettings` in **INI format** (`QSettings.IniFormat`, user scope), which on Windows lands at:
+`%APPDATA%\FrameCaptureApp\FrameCaptureApp.ini` (i.e. `C:\Users\<you>\AppData\Roaming\FrameCaptureApp\FrameCaptureApp.ini`)
 
 Key settings:
 - `capture_interval`: Milliseconds between captures (default: 500ms = 2fps)
@@ -110,7 +110,7 @@ frame-capture-app/
 │   ├── requirements.txt
 │   ├── setup.py
 │   └── build.bat
-├── docs/superpowers/specs/  # Design + implementation plan (local only, gitignored)
+├── docs/superpowers/specs/  # Design + implementation plan (local only, gitignored; its README.md index is still tracked)
 ├── run.bat
 └── README.md
 ```
@@ -119,8 +119,10 @@ frame-capture-app/
 
 ### Dependencies
 
-- PyQt5>=5.15.9
-- opencv-python>=4.8.0
+Runtime (from `build/requirements.txt`, which also carries the build-time deps `pyinstaller` and `setuptools`):
+
+- pyqt5>=5.15.9
+- opencv-python (unpinned)
 - pillow>=10.0.0
 - numpy>=1.24.0
 - mss>=6.1.0

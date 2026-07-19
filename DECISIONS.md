@@ -19,12 +19,12 @@ Launch via a batch file that runs `conda activate framecapture` before `python s
 
 ## 2026-05-30 — Design docs removed from GitHub (commit 6ddf0ee)
 
-`docs/superpowers/specs/` (design doc + implementation plan) was committed, then deliberately deleted from the repo and gitignored the same night; the files remain on disk. TODO(edgar): reason not recorded anywhere — re-track or keep local-only?
+`docs/superpowers/specs/` (design doc + implementation plan) was committed, then deliberately deleted from the repo and gitignored the same night; the files remain on disk. The folder's small `README.md` index was never deleted and is still tracked (gitignore doesn't affect already-tracked files). TODO(edgar): reason not recorded anywhere — re-track or keep local-only?
 
 ## 2026-05-30 — Initial stack (commit d724024, per design doc)
 
 - **PyQt5** for the GUI (design doc names it as the constraint; alternatives not recorded).
 - **mss** for screen capture; **OpenCV/Pillow/numpy** for image handling.
 - **Disk-based circular buffer** of up to 200 PNG frames (lossless, ~200–400 MB budget) rather than in-memory frames — chosen in the design doc to balance storage vs. browsing time.
-- **Windows Registry via QSettings** (`HKCU\Software\FrameCaptureApp`) for configuration — code truth (`utils/config.py`).
+- **INI-file config via QSettings** (`QSettings.IniFormat`, user scope → `%APPDATA%\FrameCaptureApp\FrameCaptureApp.ini`) — code truth (`utils/config.py`). *(Corrected 2026-07-19: earlier docs claimed Windows Registry storage; the code has used `IniFormat` in every committed version.)*
 - **PyInstaller single-file exe** as the distribution target (`build/`).
