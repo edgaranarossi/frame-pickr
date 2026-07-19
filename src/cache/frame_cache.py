@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import cv2
 import numpy as np
 from PIL import Image
 
@@ -36,17 +37,22 @@ class FrameCache:
         frame_count: Current number of frames in cache
     """
     
-    def __init__(self, max_frames: int = 200):
+    def __init__(self, max_frames: int = 200, progress_callback=None):
         """Initialize the frame cache.
-        
+
         Args:
             max_frames: Maximum number of frames to cache (default: 200)
+            progress_callback: Optional callback to report progress during loading (current, total)
         """
         self.max_frames = max_frames
         self._frames: OrderedDict[int, FrameMetadata] = OrderedDict()
         self._next_index = 0
-        self._temp_directory = Path(os.environ.get('TEMP', 'C:\\Temp')) / "frame-capture-cache"
-        self._temp_directory.mkdir(parents=True, exist_ok=True)
+        # Cache directory alongside the executable
+        self._cache_directory = Path(__file__).resolve().parent.parent / "cache"
+        self._cache_directory.mkdir(parents=True, exist_ok=True)
+
+        # Load existing frames from previous sessions
+        self._load_existing_frames(progress_callback)
     
     @property
     def frame_count(self) -> int:
@@ -80,13 +86,15 @@ class FrameCache:
         # Get dimensions
         height, width = frame_data.shape[:2]
         
-        # Generate filename
-        filename = f"frame_{self._next_index:06d}.png"
-        file_path = str(self._temp_directory / filename)
+        # Generate timestamp-based filename
+        filename = f"frame_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')[:-3]}.png"
+        file_path = str(self._cache_directory / filename)
         
         try:
             # Save frame as PNG
-            image = Image.fromarray(frame_data)
+            # Convert BGR to RGB for correct color representation in saved image
+            rgb_frame = cv2.cvtColor(frame_data, cv2.COLOR_BGR2RGB) if frame_data.shape[2] == 3 else frame_data
+            image = Image.fromarray(rgb_frame)
             image.save(file_path, format='PNG', compress_level=1)
             
             # Create metadata
@@ -228,10 +236,133 @@ class FrameCache:
     
     def get_newest_frame_index(self) -> Optional[int]:
         """Get the newest frame index.
-        
+
         Returns:
             Newest frame index, or None if cache is empty
         """
         if not self._frames:
             return None
         return list(self._frames.keys())[-1]
+
+    def _load_existing_frames(self, progress_callback=None):
+        """Load existing frame files from the cache directory.
+
+        Scans the cache directory for previously saved frames and loads them
+        into the cache to maintain continuity across application sessions.
+        Also performs cleanup of excess frames if cache exceeds max_frames.
+
+        Args:
+            progress_callback: Optional callback to report progress (current, total)
+        """
+        import re
+
+        # Pattern to match frame_YYYYMMDD_HHMMSS_ms.png
+        pattern = re.compile(r'^frame_(\d{8})_(\d{6})_(\d{3})\.png$')
+
+        try:
+            files = list(self._cache_directory.glob('frame_*.png'))
+        except Exception:
+            return
+
+        frames = []
+        for file_path in files:
+            try:
+                filename = file_path.name
+                match = pattern.match(filename)
+                if match:
+                    frames.append((filename, file_path))
+            except Exception:
+                continue
+
+        # Sort by filename (timestamp-based format sorts correctly alphabetically)
+        frames.sort(key=lambda x: x[0])
+
+        total_frames = len(frames)
+        if progress_callback and total_frames > 0:
+            progress_callback(0, total_frames)
+
+        # Load frames into cache with sequential indices (oldest=0)
+        for idx, (_, file_path) in enumerate(frames):
+            try:
+                # Get dimensions from the image
+                image = Image.open(file_path)
+                width, height = image.size
+
+                metadata = FrameMetadata(
+                    index=idx,
+                    timestamp=0.0,
+                    file_path=str(file_path),
+                    dimensions=(width, height)
+                )
+                self._frames[idx] = metadata
+            except Exception:
+                # If we can't load a frame, skip it
+                continue
+
+            if progress_callback and (idx + 1) % 10 == 0:
+                progress_callback(idx + 1, total_frames)
+
+        if progress_callback and total_frames > 0:
+            progress_callback(total_frames, total_frames)
+        import re
+
+        # Pattern to match frame_YYYYMMDD_HHMMSS_ms.png
+        pattern = re.compile(r'^frame_(\d{8})_(\d{6})_(\d{3})\.png$')
+
+        try:
+            files = list(self._cache_directory.glob('frame_*.png'))
+        except Exception:
+            return
+
+        frames = []
+        for file_path in files:
+            try:
+                filename = file_path.name
+                match = pattern.match(filename)
+                if match:
+                    frames.append((filename, file_path))
+            except Exception:
+                continue
+
+        # Sort by filename (timestamp-based format sorts correctly alphabetically)
+        frames.sort(key=lambda x: x[0])
+
+        if progress_callback:
+            progress_callback(0, len(frames))
+
+        # Load frames into cache with sequential indices (oldest=0)
+        for idx, (_, file_path) in enumerate(frames):
+            try:
+                # Get dimensions from the image
+                image = Image.open(file_path)
+                width, height = image.size
+
+                metadata = FrameMetadata(
+                    index=idx,
+                    timestamp=0.0,
+                    file_path=str(file_path),
+                    dimensions=(width, height)
+                )
+                self._frames[idx] = metadata
+            except Exception:
+                # If we can't load a frame, skip it
+                continue
+
+            if progress_callback and (idx + 1) % 10 == 0:
+                progress_callback(idx + 1, len(frames))
+
+        if progress_callback:
+            progress_callback(len(frames), len(frames))
+
+        # Update next index based on loaded frames
+        if self._frames:
+            self._next_index = max(self._frames.keys()) + 1
+
+        # Cleanup: remove oldest frames if cache exceeds max_frames
+        while len(self._frames) > self.max_frames:
+            oldest_index = next(iter(self._frames))
+            oldest_metadata = self._frames.pop(oldest_index)
+            try:
+                os.remove(oldest_metadata.file_path)
+            except OSError:
+                pass  # Ignore removal errors

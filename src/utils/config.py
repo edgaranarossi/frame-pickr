@@ -20,6 +20,7 @@ class Config:
     THEME = "theme"
     LAST_BBOX = "last_bbox"
     WINDOW_GEOMETRY = "window_geometry"
+    PREVIEW_GEOMETRY = "preview_geometry"
     
     def __init__(self):
         """Initialize configuration with settings file."""
@@ -32,15 +33,19 @@ class Config:
     
     def get(self, key: str, default: Any = None) -> Any:
         """Get a configuration value.
-        
+
         Args:
             key: Configuration key
             default: Default value if key doesn't exist
-            
+
         Returns:
             Configuration value or default
         """
-        return self.settings.value(key, defaultValue=default)
+        value = self.settings.value(key, defaultValue=default)
+        # Convert string "None" to actual None
+        if value == "None":
+            return None
+        return value
     
     def set(self, key: str, value: Any) -> None:
         """Set a configuration value.
@@ -72,7 +77,11 @@ class Config:
     @property
     def capture_interval(self) -> int:
         """Get capture interval in milliseconds."""
-        return self.get(self.CAPTURE_INTERVAL, 500)
+        value = self.settings.value(self.CAPTURE_INTERVAL, "500")
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 500
     
     @capture_interval.setter
     def capture_interval(self, value: int) -> None:
@@ -82,7 +91,11 @@ class Config:
     @property
     def max_frames(self) -> int:
         """Get maximum frames in cache."""
-        return self.get(self.MAX_FRAMES, 200)
+        value = self.settings.value(self.MAX_FRAMES, "200")
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 200
     
     @max_frames.setter
     def max_frames(self, value: int) -> None:
@@ -92,7 +105,11 @@ class Config:
     @property
     def thumbnail_size(self) -> int:
         """Get thumbnail size in pixels."""
-        return self.get(self.THUMBNAIL_SIZE, 128)
+        value = self.settings.value(self.THUMBNAIL_SIZE, "128")
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 128
     
     @thumbnail_size.setter
     def thumbnail_size(self, value: int) -> None:
@@ -102,7 +119,11 @@ class Config:
     @property
     def grid_columns(self) -> int:
         """Get number of columns in gallery grid."""
-        return self.get(self.GRID_COLUMNS, 4)
+        value = self.settings.value(self.GRID_COLUMNS, "4")
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 4
     
     @grid_columns.setter
     def grid_columns(self, value: int) -> None:
@@ -112,7 +133,11 @@ class Config:
     @property
     def preview_scale(self) -> float:
         """Get preview scaling factor."""
-        return self.get(self.PREVIEW_SCALE, 0.8)
+        value = self.settings.value(self.PREVIEW_SCALE, "0.8")
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return 0.8
     
     @preview_scale.setter
     def preview_scale(self, value: float) -> None:
@@ -122,7 +147,10 @@ class Config:
     @property
     def auto_save(self) -> bool:
         """Get auto-save setting."""
-        return self.get(self.AUTO_SAVE, True)
+        value = self.settings.value(self.AUTO_SAVE, "true")
+        if isinstance(value, str):
+            return value.lower() in ("true", "1", "yes")
+        return bool(value)
     
     @auto_save.setter
     def auto_save(self, value: bool) -> None:

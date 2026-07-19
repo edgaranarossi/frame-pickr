@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 from typing import Optional, Tuple
 
+import cv2
 import numpy as np
 from PIL import Image
 from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal, pyqtSlot
@@ -202,11 +203,12 @@ class FrameCaptureEngine(QObject):
             
             with mss.mss() as sct:
                 screenshot = sct.grab(monitor)
-                # Convert to numpy array
+                # mss returns BGRA data
+                # Convert to numpy array and convert BGRA to BGR
                 frame = np.array(screenshot)
-                # Convert BGRA to BGR (remove alpha channel)
                 if frame.shape[2] == 4:
-                    frame = frame[:, :, :3]
+                    # BGRA to BGR: swap R and B channels
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
                 return frame
                 
         except ImportError:
